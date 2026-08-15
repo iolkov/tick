@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tick - To Do</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="header">
+        <div class="header-section left-section">
+            <button class="menu-button" onclick="app.toggleSidebar()">☰</button>
+            <button class="back-button" onclick="app.hideTodoDetail()" id="back-btn">← Назад</button>
+        </div>
+        
+        <div class="header-section middle-section">
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Поиск задач..." id="searchInput" oninput="app.filterTodos()">
+            </div>
+        </div>
+        
+        <div class="header-section right-section">
+            <!-- <button class="profile-button" id="username-btn">{{.Name}}</button> -->
+             <button class="profile-button" id="username-btn">
+                <img src="{{.AvatarURL}}" alt="Аватар" class="profile-avatar">
+            </button>
+            <button class="new-task-btn-mobile" onclick="app.showNewTodo()" title="Новая задача">+</button>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <!-- Боковая панель (список задач) -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Мои задачи</h3>
+                <button class="new-task-btn" onclick="app.showNewTodo()">+ Новая</button>
+            </div>
+            
+            <div class="todo-filters">
+                <button class="filter-btn active" onclick="app.setFilter('all')">Все</button>
+                <button class="filter-btn" onclick="app.setFilter('active')">Активные</button>
+                <button class="filter-btn" onclick="app.setFilter('completed')">Завершенные</button>
+            </div>
+            
+            <div class="todo-list" id="todo-list">
+                <!-- Задачи будут загружены здесь -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Загрузка задач...</p>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="stats">
+                    <span id="total-count">0</span> всего
+                    <span id="active-count" class="active">0</span> активно
+                </div>
+            </div>
+        </div>
+
+        <!-- Основная область (детали/редактирование) -->
+        <div class="main-area" id="main-area">
+            <!-- Приветственный экран -->
+            <div class="welcome-screen" id="welcome">
+                <div class="welcome-content">
+                    <div class="welcome-icon">✓</div>
+                    <h1>Добро пожаловать в Tick, {{.Name}}!</h1>
+                    <p class="subtitle">Минималистичный менеджер задач</p>
+                    <p class="description">Выберите задачу из списка слева или создайте новую</p>
+                    <button class="primary-btn" onclick="app.showNewTodo()">
+                        + Создать первую задачу
+                    </button>
+                </div>
+            </div>
+
+            <!-- Детали задачи -->
+            <div class="todo-detail" id="todo-detail">
+                <div class="detail-header">
+                    <input type="text" class="todo-title-input" id="todo-title" placeholder="Название задачи">
+                    <div class="header-actions">
+                        <button class="icon-btn delete-btn" onclick="app.deleteTodo()" title="Удалить">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="todo-meta">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="todo-completed">
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label">Завершена</span>
+                    </label>
+                    <span class="todo-date" id="todo-date"></span>
+                </div>
+                
+                <div class="todo-description-container">
+                    <label class="section-label">Описание</label>
+                    <textarea class="todo-description" id="todo-description" 
+                              placeholder="Добавьте описание задачи..."></textarea>
+                </div>
+                
+                <div class="detail-actions">
+                    <button class="primary-btn" onclick="app.saveTodo()">
+                        💾 Сохранить изменения
+                    </button>
+                    <button class="secondary-btn" onclick="app.cancelEdit()">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+
+            <!-- Создание новой задачи -->
+            <div class="create-todo" id="todo-create">
+                <h2 class="create-title">Новая задача</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Название</label>
+                    <input type="text" class="form-input" id="new-title" 
+                           placeholder="Что нужно сделать?">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Описание</label>
+                    <textarea class="form-textarea" id="new-description" 
+                              placeholder="Добавьте детали..."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="primary-btn" onclick="app.createTodo()">
+                        + Создать задачу
+                    </button>
+                    <button class="secondary-btn" onclick="app.cancelCreate()">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div class="toast-container" id="toast-container">
+        <div class="toast" id="toast">
+            <div class="toast-header">
+                <strong>Tick</strong>
+                <button class="toast-close" onclick="app.hideToast()">×</button>
+            </div>
+            <div class="toast-body" id="toast-body"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
