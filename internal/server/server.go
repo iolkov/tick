@@ -4,14 +4,14 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
-	"time"
 
+	"tick/internal/config"
 	"tick/internal/database"
 )
 
 type application struct {
 	templateCache map[string]*template.Template
+	cfg           config.Config
 }
 
 type Server struct {
@@ -20,6 +20,11 @@ type Server struct {
 }
 
 func New() *Server {
+	conf, err := config.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Инициализация БД
 	if err := database.InitDB(); err != nil {
 		log.Fatal(err)
@@ -32,36 +37,23 @@ func New() *Server {
 
 	app := &application{
 		templateCache: templateCache,
+		cfg:           conf,
 	}
 
 	// Создаем сервер
 	srv := &Server{
 		Server: &http.Server{
 			Handler:           app.newRouters(),
-			Addr:              getPort(),
-			ReadTimeout:       60 * time.Second,
-			WriteTimeout:      60 * time.Second,
-			IdleTimeout:       180 * time.Second,
+			Addr:              conf.GetServerAddress(),
+			ReadTimeout:       conf.GetServerReadTimeout(),
+			WriteTimeout:      conf.GetServerWriteTimeout(),
+			IdleTimeout:       conf.GetServerIdleTimeout(),
 			MaxHeaderBytes:    1 << 20,
-			ReadHeaderTimeout: 30 * time.Second,
+			ReadHeaderTimeout: conf.GetServerReadHeaderTimeout(),
 		},
 	}
 
 	srv.Handler = app.newRouters()
 
 	return srv
-}
-
-func getStaticDir() string {
-	if dir := os.Getenv("STATIC_DIR"); dir != "" {
-		return dir
-	}
-	return "./web"
-}
-
-func getPort() string {
-	if port := os.Getenv("PORT"); port != "" {
-		return ":" + port
-	}
-	return ":8080"
 }
