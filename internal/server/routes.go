@@ -17,7 +17,7 @@ func (app application) newRouters() http.Handler {
 	mux.HandleFunc("POST /api/todos", handlers.CreateTodo)
 	mux.HandleFunc("DELETE /api/todos/{id}", handlers.DeleteTodo)
 	mux.HandleFunc("PUT /api/todos/{id}", handlers.UpdateTodo)
-	mux.HandleFunc("GET /health", handlers.HealthCheck)
+	mux.HandleFunc("GET /health", handlers.HealthCheck(app.info))
 
 	fileServer := http.FileServer(http.Dir("./web/"))
 

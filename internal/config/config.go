@@ -15,6 +15,7 @@ type Config interface {
 	GetServerReadTimeout() time.Duration
 	GetServerReadHeaderTimeout() time.Duration
 	GetDomain() string
+	GetDatabase() string
 }
 
 type EnvConfig struct{}
@@ -51,6 +52,10 @@ func (c *EnvConfig) GetServerReadHeaderTimeout() time.Duration {
 
 func (c *EnvConfig) GetDomain() string {
 	return getEnv("DOMAIN", "exemple.com")
+}
+
+func (c *EnvConfig) GetDatabase() string {
+	return getEnv("DATABASE", "tick.db")
 }
 
 func getEnv(key, defaultValue string) string {

@@ -7,11 +7,13 @@ import (
 
 	"tick/internal/config"
 	"tick/internal/database"
+	"tick/internal/info"
 )
 
 type application struct {
 	templateCache map[string]*template.Template
 	cfg           config.Config
+	info          info.AppInfo
 }
 
 type Server struct {
@@ -19,14 +21,14 @@ type Server struct {
 	tmpl *template.Template
 }
 
-func New() *Server {
+func New(info *info.AppInfo) *Server {
 	conf, err := config.New()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Инициализация БД
-	if err := database.InitDB(); err != nil {
+	if err := database.InitDB(conf.GetDatabase()); err != nil {
 		log.Fatal(err)
 	}
 
@@ -38,6 +40,7 @@ func New() *Server {
 	app := &application{
 		templateCache: templateCache,
 		cfg:           conf,
+		info:          *info,
 	}
 
 	// Создаем сервер

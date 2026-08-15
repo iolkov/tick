@@ -9,9 +9,9 @@ import (
 
 var DB *sql.DB
 
-func InitDB() error {
+func InitDB(file string) error {
 	var err error
-	DB, err = sql.Open("sqlite3", "./tick.db")
+	DB, err = sql.Open("sqlite3", file)
 	if err != nil {
 		return err
 	}
