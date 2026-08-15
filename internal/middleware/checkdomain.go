@@ -4,13 +4,17 @@ import (
 	"net/http"
 )
 
-func CheckDomainMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("X-Forwarded-Host") != "tick.iolkov.ru" {
-			w.WriteHeader(423)
-			return
-		}
+func CheckDomainMiddleware(domain string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		next.ServeHTTP(w, r)
-	})
+			// Если заголовок не совпадает - возвращаем 423
+			if r.Header.Get("X-Forwarded-Host") != domain {
+				http.Error(w, "Forbidden", http.StatusLocked)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
 }
