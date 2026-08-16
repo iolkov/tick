@@ -7,7 +7,7 @@ import (
 	"tick/internal/models"
 
 	"github.com/google/uuid"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 func GetUser(user *models.UserData) (uuid.UUID, error) {
