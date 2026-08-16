@@ -7,7 +7,7 @@ COPY go.mod .
 RUN go mod download
 COPY . .
 RUN echo "Version: $VERSION, Build: $BUILD, Date: $DATE"
-RUN export CGO_ENABLED=0
+RUN export CGO_ENABLED=1
 RUN export GOOS=linux
 RUN go build -ldflags="-X main.version=$VERSION -X main.build=$BUILD -X main.date=$DATE" -o ./tick ./cmd/main.go
 FROM scratch
