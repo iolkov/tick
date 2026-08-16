@@ -1,4 +1,5 @@
 FROM golang:1.24-alpine AS builder
+RUN apk add --no-cache gcc musl-dev
 ARG VERSION=1.0.0
 ARG BUILD=1
 ARG DATE=04.04.2025
