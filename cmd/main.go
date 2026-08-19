@@ -2,15 +2,17 @@ package main
 
 import (
 	"log"
+	"tick/internal/config"
 	"tick/internal/info"
+	"tick/internal/logger"
 	"tick/internal/server"
 	"time"
 )
 
 var (
-	version = "0.0.1-alpha"
-	build   = "000000000000"
-	date    = time.Now().Format(time.RFC3339)
+	version = ""
+	build   = ""
+	date    = ""
 )
 
 func main() {
@@ -21,10 +23,21 @@ func main() {
 		Start:   time.Now(),
 	}
 
-	srv := server.New(info)
-
-	log.Printf("Server starting on %s", srv.Addr)
-	if err := srv.ListenAndServe(); err != nil {
+	conf, err := config.New()
+	if err != nil {
 		log.Fatal(err)
+	}
+
+	log := logger.InitLogger(conf.GetLogLevel())
+
+	srv := server.New(info, conf, log)
+
+	log.Info("Server starting",
+		"address", srv.Addr,
+	)
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("Server failed",
+			"error", err,
+		)
 	}
 }

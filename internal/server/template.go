@@ -1,31 +1,21 @@
 package server
 
 import (
-	"fmt"
 	"html/template"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-// Эту структуру не трогаем, она тут из прошлого урока...
-// type templateData struct {
-// 	Username string
-// 	Name     string
-// 	// AvatarURL string
-// }
-
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		return nil, fmt.Errorf("path %s was not found", dir)
+		return nil, err
 	}
 
-	// Собираем все layout и partial файлы
 	var layouts, partials []string
 
-	// Функция для сбора вспомогательных файлов
 	collectHelpers := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -42,12 +32,10 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		return nil
 	}
 
-	// Собираем все вспомогательные файлы
 	if err := filepath.Walk(dir, collectHelpers); err != nil {
 		return nil, err
 	}
 
-	// Функция для обработки page шаблонов
 	processPage := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -65,7 +53,6 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 				return err
 			}
 
-			// Добавляем все layout файлы
 			if len(layouts) > 0 {
 				ts, err = ts.ParseFiles(layouts...)
 				if err != nil {
@@ -73,7 +60,6 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 				}
 			}
 
-			// Добавляем все partial файлы
 			if len(partials) > 0 {
 				ts, err = ts.ParseFiles(partials...)
 				if err != nil {
@@ -86,7 +72,6 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 		return nil
 	}
 
-	// Обрабатываем page шаблоны
 	if err := filepath.Walk(dir, processPage); err != nil {
 		return nil, err
 	}

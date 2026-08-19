@@ -22,7 +22,7 @@ func (app application) homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.URL.Path != "/" {
-		http.NotFound(w, r) // Отправляет стандартную 404 страницу
+		http.NotFound(w, r)
 		return
 	}
 
@@ -34,21 +34,4 @@ func (app application) homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.render(w, r, "home.page.html", &data)
-}
-
-func (app application) templateHandler(w http.ResponseWriter, r *http.Request) {
-	user, ok := handlers.GetUserFromContext(r)
-	if !ok {
-		http.Error(w, "User not authenticated", http.StatusUnauthorized)
-		return
-	}
-
-	data := TemplateData{
-		Email:     user.Email,
-		Name:      user.DisplayName,
-		UserID:    user.UUID,
-		AvatarURL: user.AvatarURL,
-	}
-
-	app.render(w, r, "template.page.html", &data)
 }

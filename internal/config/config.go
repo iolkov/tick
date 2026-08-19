@@ -14,8 +14,11 @@ type Config interface {
 	GetServerIdleTimeout() time.Duration
 	GetServerReadTimeout() time.Duration
 	GetServerReadHeaderTimeout() time.Duration
+	GetTemplateDir() string
 	GetDomain() string
 	GetDatabase() string
+	GetLogLevel() string
+	GetLogType() string
 }
 
 type EnvConfig struct{}
@@ -50,12 +53,25 @@ func (c *EnvConfig) GetServerReadHeaderTimeout() time.Duration {
 	return getEnvDuration("SERVER_READ_HEADER_TIMEOUT", 5*time.Second)
 }
 
+func (c *EnvConfig) GetTemplateDir() string {
+	return getEnv("TEMPLATE_DIR", "web")
+}
+
 func (c *EnvConfig) GetDomain() string {
 	return getEnv("DOMAIN", "exemple.com")
 }
 
 func (c *EnvConfig) GetDatabase() string {
 	return getEnv("DATABASE", "tick.db")
+}
+
+// Логи
+func (c *EnvConfig) GetLogLevel() string {
+	return getEnv("LOG_LEVEL", "info")
+}
+
+func (c *EnvConfig) GetLogType() string {
+	return getEnv("LOG_TYPE", "tick.db")
 }
 
 func getEnv(key, defaultValue string) string {
