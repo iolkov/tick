@@ -28,9 +28,9 @@ func LoggingMiddleware(log *slog.Logger) func(http.Handler) http.Handler {
 
 			next.ServeHTTP(wrapped, r)
 
-			if wrapped.statusCode == 0 {
-				wrapped.statusCode = http.StatusOK
-			}
+			// if wrapped.statusCode == 0 {
+			// 	wrapped.statusCode = http.StatusOK
+			// }
 
 			log.Info("request",
 				"ip", r.RemoteAddr,

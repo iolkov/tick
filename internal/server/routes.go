@@ -27,7 +27,7 @@ func (app application) newRouters() http.Handler {
 		mux,
 		middleware.RecoveryMiddleware(app.log),
 		middleware.LoggingMiddleware(app.log),
-		middleware.CheckDomainMiddleware(app.cfg.GetDomain()),
+		middleware.CheckDomainMiddleware(app.conf.GetDomain()),
 		middleware.AuthMiddleware(app.log),
 	)
 

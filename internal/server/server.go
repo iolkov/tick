@@ -12,14 +12,13 @@ import (
 
 type application struct {
 	templateCache map[string]*template.Template
-	cfg           config.Config
+	conf          config.Config
 	info          info.AppInfo
 	log           *slog.Logger
 }
 
 type Server struct {
 	*http.Server
-	tmpl *template.Template
 }
 
 func New(info *info.AppInfo, conf config.Config, log *slog.Logger) *Server {
@@ -38,7 +37,7 @@ func New(info *info.AppInfo, conf config.Config, log *slog.Logger) *Server {
 
 	app := &application{
 		templateCache: templateCache,
-		cfg:           conf,
+		conf:          conf,
 		info:          *info,
 		log:           log,
 	}

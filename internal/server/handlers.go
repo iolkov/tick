@@ -14,6 +14,21 @@ type TemplateData struct {
 	AvatarURL string
 }
 
+func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *TemplateData) {
+	ts, ok := app.templateCache[name]
+	if !ok {
+		app.log.Error("Шаблон не существует", "template", name)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err := ts.Execute(w, td)
+	if err != nil {
+		app.log.Error("Ошибка поиска шаблона", "error", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+}
+
 func (app application) homeHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := handlers.GetUserFromContext(r)
 	if !ok {
