@@ -2,7 +2,7 @@ package server
 
 import (
 	"html/template"
-	"log"
+	"log/slog"
 	"net/http"
 
 	"tick/internal/config"
@@ -12,35 +12,34 @@ import (
 
 type application struct {
 	templateCache map[string]*template.Template
-	cfg           config.Config
+	conf          config.Config
 	info          info.AppInfo
+	log           *slog.Logger
 }
 
 type Server struct {
 	*http.Server
-	tmpl *template.Template
 }
 
-func New(info *info.AppInfo) *Server {
-	conf, err := config.New()
-	if err != nil {
-		log.Fatal(err)
+func New(info *info.AppInfo, conf config.Config, log *slog.Logger) *Server {
+	if err := database.InitDB(conf.GetDatabase(), log); err != nil {
+		log.Error("initialized database",
+			"error", err,
+		)
 	}
 
-	// Инициализация БД
-	if err := database.InitDB(conf.GetDatabase()); err != nil {
-		log.Fatal(err)
-	}
-
-	templateCache, err := newTemplateCache("./web/")
+	templateCache, err := newTemplateCache(conf.GetTemplateDir())
 	if err != nil {
-		log.Fatal("failed to load templates")
+		log.Error("failed to load templates",
+			"error", err,
+		)
 	}
 
 	app := &application{
 		templateCache: templateCache,
-		cfg:           conf,
+		conf:          conf,
 		info:          *info,
+		log:           log,
 	}
 
 	// Создаем сервер
@@ -55,8 +54,6 @@ func New(info *info.AppInfo) *Server {
 			ReadHeaderTimeout: conf.GetServerReadHeaderTimeout(),
 		},
 	}
-
-	srv.Handler = app.newRouters()
 
 	return srv
 }

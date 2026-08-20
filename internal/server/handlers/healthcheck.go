@@ -9,7 +9,6 @@ import (
 
 func HealthCheck(info info.AppInfo) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		response := map[string]interface{}{
 			"status":  "ok",
 			"service": "tick",

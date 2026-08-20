@@ -2,21 +2,20 @@ package database
 
 import (
 	"database/sql"
-	"log"
+	"log/slog"
 
 	_ "modernc.org/sqlite"
 )
 
 var DB *sql.DB
 
-func InitDB(file string) error {
+func InitDB(file string, log *slog.Logger) error {
 	var err error
 	DB, err = sql.Open("sqlite", file)
 	if err != nil {
 		return err
 	}
 
-	// Test connection
 	if err = DB.Ping(); err != nil {
 		return err
 	}
@@ -65,7 +64,6 @@ func InitDB(file string) error {
 		FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 	)`
 
-	// Create index
 	indexQuery := `CREATE INDEX IF NOT EXISTS idx_todos_user_id ON todos(user_id)`
 
 	if _, err := DB.Exec(todosTable); err != nil {
@@ -84,21 +82,19 @@ func InitDB(file string) error {
 		return err
 	}
 
-	log.Println("Database initialized successfully")
+	log.Info("Database initialized",
+		"status", "successfully",
+	)
 	return nil
 }
+func GetOrCreateUser(username, email string) (int64, error) {
+	var userID int64
 
-// GetOrCreateUser gets or creates a user
-func GetOrCreateUser(username, email string) (int, error) {
-	var userID int
-
-	// Try to find by username
 	err := DB.QueryRow("SELECT id FROM users WHERE username = ?", username).Scan(&userID)
 	if err == nil {
 		return userID, nil
 	}
 
-	// Try to find by email if email provided
 	if email != "" {
 		err = DB.QueryRow("SELECT id FROM users WHERE email = ?", email).Scan(&userID)
 		if err == nil {
@@ -106,16 +102,14 @@ func GetOrCreateUser(username, email string) (int, error) {
 		}
 	}
 
-	// Create new user
-	result, err := DB.Exec(
-		"INSERT INTO users (username, email) VALUES (?, ?)",
-		username, email,
-	)
-
+	result, err := DB.Exec("INSERT INTO users (username, email) VALUES (?, ?)", username, email)
 	if err != nil {
 		return 0, err
 	}
 
-	id, _ := result.LastInsertId()
-	return int(id), nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, nil
+	}
+	return id, nil
 }

@@ -12,7 +12,6 @@ func (app application) newRouters() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /", app.homeHandler)
-	mux.HandleFunc("GET /template", app.templateHandler)
 	mux.HandleFunc("GET /api/todos", handlers.GetTodos)
 	mux.HandleFunc("POST /api/todos", handlers.CreateTodo)
 	mux.HandleFunc("DELETE /api/todos/{id}", handlers.DeleteTodo)
@@ -26,10 +25,10 @@ func (app application) newRouters() http.Handler {
 
 	handler := middleware.Chain(
 		mux,
-		middleware.RecoveryMiddleware,
-		middleware.CheckDomainMiddleware(app.cfg.GetDomain()),
-		middleware.LoggingMiddleware,
-		middleware.AuthMiddleware,
+		middleware.RecoveryMiddleware(app.log),
+		middleware.LoggingMiddleware(app.log),
+		middleware.CheckDomainMiddleware(app.conf.GetDomain()),
+		middleware.AuthMiddleware(app.log),
 	)
 
 	return handler

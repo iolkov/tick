@@ -14,6 +14,21 @@ type TemplateData struct {
 	AvatarURL string
 }
 
+func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *TemplateData) {
+	ts, ok := app.templateCache[name]
+	if !ok {
+		app.log.Error("Шаблон не существует", "template", name)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	err := ts.Execute(w, td)
+	if err != nil {
+		app.log.Error("Ошибка поиска шаблона", "error", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+}
+
 func (app application) homeHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := handlers.GetUserFromContext(r)
 	if !ok {
@@ -22,7 +37,7 @@ func (app application) homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.URL.Path != "/" {
-		http.NotFound(w, r) // Отправляет стандартную 404 страницу
+		http.NotFound(w, r)
 		return
 	}
 
@@ -34,21 +49,4 @@ func (app application) homeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.render(w, r, "home.page.html", &data)
-}
-
-func (app application) templateHandler(w http.ResponseWriter, r *http.Request) {
-	user, ok := handlers.GetUserFromContext(r)
-	if !ok {
-		http.Error(w, "User not authenticated", http.StatusUnauthorized)
-		return
-	}
-
-	data := TemplateData{
-		Email:     user.Email,
-		Name:      user.DisplayName,
-		UserID:    user.UUID,
-		AvatarURL: user.AvatarURL,
-	}
-
-	app.render(w, r, "template.page.html", &data)
 }
