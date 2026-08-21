@@ -19,6 +19,12 @@ type Config interface {
 	GetDatabase() string
 	GetLogLevel() string
 	GetLogType() string
+	GetPostgresqlHost() string
+	GetPostgresqlPort() string
+	GetPostgresqlUser() string
+	GetPosrgresqlPassword() string
+	GetPostgresqlDbName() string
+	GetPostgreSqlMode() string
 }
 
 type EnvConfig struct{}
@@ -72,6 +78,27 @@ func (c *EnvConfig) GetLogLevel() string {
 
 func (c *EnvConfig) GetLogType() string {
 	return getEnv("LOG_TYPE", "tick.db")
+}
+
+// postgresql
+// conf postgresql
+func (c *EnvConfig) GetPostgresqlHost() string {
+	return getEnv("POSTGRESQL_HOST", "")
+}
+func (c *EnvConfig) GetPostgresqlPort() string {
+	return getEnv("POSTGRESQL_PORT", "tick.db")
+}
+func (c *EnvConfig) GetPostgresqlUser() string {
+	return getEnv("POSTGRESQL_USER", "tick.db")
+}
+func (c *EnvConfig) GetPosrgresqlPassword() string {
+	return getEnv("POSTGRESQL_PASSWORD", "tick.db")
+}
+func (c *EnvConfig) GetPostgresqlDbName() string {
+	return getEnv("POSTGRESQL_DB_NAME", "tick.db")
+}
+func (c *EnvConfig) GetPostgreSqlMode() string {
+	return getEnv("POSTGRESQLE_SSL_MODE", "tick.db")
 }
 
 func getEnv(key, defaultValue string) string {

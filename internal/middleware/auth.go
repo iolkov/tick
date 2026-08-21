@@ -44,7 +44,18 @@ func AuthMiddleware(log *slog.Logger) func(http.Handler) http.Handler {
 				return
 			}
 
-			userData.UUID = userUUID
+			puserUUID, err := database.PGetUser(userData)
+			if err != nil {
+				log.Error("Failed to get/create user",
+					"error", err,
+					"type", "postgresql",
+				)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				return
+			}
+			log.Info(userUUID.String())
+
+			userData.UUID = puserUUID
 			ctx := context.WithValue(r.Context(), "user", userData)
 
 			next.ServeHTTP(w, r.WithContext(ctx))

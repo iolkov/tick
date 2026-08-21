@@ -84,6 +84,7 @@ func InitDB(file string, log *slog.Logger) error {
 
 	log.Info("Database initialized",
 		"status", "successfully",
+		"type", "sqlite",
 	)
 	return nil
 }

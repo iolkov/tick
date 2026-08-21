@@ -12,8 +12,8 @@ func (app application) newRouters() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /", app.homeHandler)
-	mux.HandleFunc("GET /api/todos", handlers.GetTodos)
-	mux.HandleFunc("POST /api/todos", handlers.CreateTodo)
+	mux.HandleFunc("GET /api/todos", handlers.PGetTodos)
+	mux.HandleFunc("POST /api/todos", handlers.PCreateTodo)
 	mux.HandleFunc("DELETE /api/todos/{id}", handlers.DeleteTodo)
 	mux.HandleFunc("PUT /api/todos/{id}", handlers.UpdateTodo)
 	mux.HandleFunc("GET /health", handlers.HealthCheck(app.info))

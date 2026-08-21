@@ -28,6 +28,12 @@ func New(info *info.AppInfo, conf config.Config, log *slog.Logger) *Server {
 		)
 	}
 
+	if err := database.InitDBPostgresql(conf, log); err != nil {
+		log.Error("initialized database",
+			"error", err,
+		)
+	}
+
 	templateCache, err := newTemplateCache(conf.GetTemplateDir())
 	if err != nil {
 		log.Error("failed to load templates",
